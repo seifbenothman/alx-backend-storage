@@ -1,0 +1,2 @@
+// list all that start with Holberton
+db.school.find({"name" : /^Holberton/}).pretty()
