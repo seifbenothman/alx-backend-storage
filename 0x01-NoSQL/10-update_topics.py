@@ -1,7 +1,8 @@
-#!/user/bin/env python3
+#!/usr/bin/env python3
+""" update """
+from pymongo import MongoClient
 
-from pymongo import mongoClient
 
 def update_topics(mongo_collection, name, topics):
-    mongo_Collection.update_many()
-
+    """ update topics """
+    mongo_collection.update_many({"name": name}, {"$set": {"topics": topics}})
