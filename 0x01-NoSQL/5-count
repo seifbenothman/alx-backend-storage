@@ -1,0 +1,2 @@
+// dcmnt count
+db.school.count()
