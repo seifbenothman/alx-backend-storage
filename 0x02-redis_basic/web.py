@@ -3,6 +3,7 @@
 import requests
 import redis
 from functools import wraps
+import time
 
 # Initialize Redis connection
 redis_conn = redis.Redis(host='localhost', port=6379, db=0)
@@ -43,9 +44,12 @@ if __name__ == "__main__":
     print(get_page(url))  # Second call within 10 seconds, should fetch from cache
     print(get_page(url))  # Third call within 10 seconds, should fetch from cache
 
-    import time
     time.sleep(11)  # Wait for the cache to expire
     print(get_page(url))  # Fourth call after cache expiration, should fetch from the web again
 
     # Print the number of times the URL was accessed
-    print(f"URL was accessed {redis_conn.get(f'count:{url}').decode('utf-8')} times.")
+    access_count = redis_conn.get(f"count:{url}")
+    if access_count:
+        print(f"URL was accessed {access_count.decode('utf-8')} times.")
+    else:
+        print("URL access count not found.")
