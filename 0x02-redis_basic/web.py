@@ -5,7 +5,7 @@ import redis
 from functools import wraps
 
 # Initialize Redis connection
-redis_conn = redis.Redis()
+redis_conn = redis.Redis(host='localhost', port=6379, db=0)
 
 def track_and_cache(func):
     """Decorator to track and cache web page content."""
@@ -17,8 +17,10 @@ def track_and_cache(func):
 
         cached_content = redis_conn.get(url)
         if cached_content:
+            print("Cache hit!")
             return cached_content.decode('utf-8')
 
+        print("Cache miss!")
         response = requests.get(url)
         page_content = response.text
 
@@ -31,8 +33,7 @@ def track_and_cache(func):
 @track_and_cache
 def get_page(url: str) -> str:
     """Fetch the page content of a URL."""
-    response = requests.get(url)
-    return response.text
+    return requests.get(url).text
 
 if __name__ == "__main__":
     url = ("http://slowwly.robertomurray.co.uk/"
@@ -45,3 +46,6 @@ if __name__ == "__main__":
     import time
     time.sleep(11)  # Wait for the cache to expire
     print(get_page(url))  # Fourth call after cache expiration, should fetch from the web again
+
+    # Print the number of times the URL was accessed
+    print(f"URL was accessed {redis_conn.get(f'count:{url}').decode('utf-8')} times.")
