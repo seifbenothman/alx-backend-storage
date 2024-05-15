@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""web.py"""
+""" web.py """
 import requests
 import redis
 from functools import wraps
@@ -17,10 +17,8 @@ def track_and_cache(func):
 
         cached_content = redis_conn.get(url)
         if cached_content:
-            print("Cache hit!")
             return cached_content.decode('utf-8')
 
-        print("Cache miss!")
         response = requests.get(url)
         page_content = response.text
 
@@ -40,6 +38,10 @@ if __name__ == "__main__":
     url = ("http://slowwly.robertomurray.co.uk/"
            "delay/1000/url/"
            "https://www.example.com")
-    print(get_page(url))
-    print(get_page(url))
-    print(get_page(url))
+    print(get_page(url))  # First call, should fetch from the web
+    print(get_page(url))  # Second call within 10 seconds, should fetch from cache
+    print(get_page(url))  # Third call within 10 seconds, should fetch from cache
+
+    import time
+    time.sleep(11)  # Wait for the cache to expire
+    print(get_page(url))  # Fourth call after cache expiration, should fetch from the web again
